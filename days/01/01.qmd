@@ -1,0 +1,97 @@
+# Methods
+
+## Imports
+
+```{python}
+import pandas as pd
+```
+
+## Example
+
+```{python}
+with open("example.txt") as f:
+    INPUT_LIST = f.read().splitlines()
+   
+rotation_dir_dict = {"L": -1, "R": 1}
+```
+
+```{python}
+def rotate_dial(start_pos:int, rotation:str)-> int:
+    rotation_dir = rotation[0]
+    rotation_dis = int(rotation[1:])
+    end_pos = start_pos + rotation_dir_dict.get(rotation_dir) * rotation_dis
+    end_pos = end_pos % 100
+    if end_pos < 0:
+        end_pos +=100
+    return end_pos
+```
+
+```{python}
+_ = rotate_dial(11, 'L12')
+print(_)
+```
+
+```{python}
+output_list = []
+start_pos = 50
+for each in INPUT_LIST:
+    start_pos = rotate_dial(start_pos, each)
+    output_list.append(start_pos)
+
+pd.DataFrame(output_list, columns=['pos']).query("pos==0").shape
+```
+
+## Part 1
+```{python}
+test_inputs = pd.read_csv("input.txt", header=None)
+```
+
+```{python}
+output_list = []
+start_pos = 50
+for index, row in test_inputs.iterrows():
+    start_pos = rotate_dial(start_pos, row[0])
+    output_list.append(start_pos)
+
+password = pd.DataFrame(output_list, columns=['pos']).query("pos==0").shape[0]
+```
+
+## Part 2
+
+```{python}
+def rotate_dial_and_count(start_pos: int, rotation: str, counter: int):
+    rotation_dir = rotation[0]
+    rotation_dis = int(rotation[1:])
+    counter += rotation_dis // 100
+    short_dis = rotation_dis % 100
+    end_pos = start_pos + rotation_dir_dict.get(rotation_dir) * short_dis
+    if end_pos <= 0 and start_pos != 0:
+        counter += 1
+    elif end_pos > 99:
+        counter += 1
+    end_pos = end_pos % 100
+    return end_pos, counter
+
+```
+### example
+```{python}
+
+output_list = []
+start_pos = 50
+counter = 0 
+output_list.append(start_pos)
+print(start_pos, counter)
+for each in INPUT_LIST:
+    start_pos, counter = rotate_dial_and_count(start_pos, each, counter)
+    output_list.append(start_pos)
+print(counter)
+```
+
+### input
+```{python}
+start_pos = 50
+counter = 0 
+for index, row in test_inputs.iterrows():
+    start_pos, counter = rotate_dial_and_count(start_pos, row[0], counter)
+print(counter)
+```
